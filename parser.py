@@ -1,5 +1,7 @@
 import nltk
+#nltk.download('punkt')
 import sys
+from nltk.tokenize import word_tokenize
 
 TERMINALS = """
 Adj -> "country" | "dreadful" | "enigmatical" | "little" | "moist" | "red"
@@ -15,7 +17,25 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> N V
+S -> NP VP | VP NP| NP VP Conj VP NP | NP VP NP| NP VP VP | NP VP NP NP | \
+NP VP NP VP | NP VP NP NP
+
+NP -> N | DET | DET VP | Conj N | Det AD N | PP N | PP N | \
+Det Adj N | Det Adj Adj N | Det N PP | N VP | Conj N VP \
+| ADV VP DET | N Adv VP | Conj N VP PP | N Adv | Det N Adv | N VP
+
+VP -> V | V  NP | V Adv | V AD | V Adv NP | V NP PP | V P | P V | V NP NP | Conj V N | \
+Conj V | NP V | V Det NP
+
+PP -> P | P NP | P Det
+
+AD -> Adj | Det Adj Adj | Det Adj Adj Adj | Adj Conj Adj
+
+ADV -> Adv | NP Adv
+
+DET -> Det | Det N
+
+CONJ -> Conj | Conj Det | Conj P | Conj Adv
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -62,7 +82,26 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    raise NotImplementedError
+
+    print()
+    print(sentence)
+
+
+    token_sentence = word_tokenize(sentence)
+
+    print(f"token_sentence: {token_sentence} \n")
+
+    tokenized_word_list = []
+
+    for char in token_sentence:
+        if char.isalpha():
+            char = char.lower()
+            tokenized_word_list.append(char)
+
+
+    print(f"tokenized_word_list: {tokenized_word_list} \n")
+
+    return tokenized_word_list
 
 
 def np_chunk(tree):
@@ -72,7 +111,8 @@ def np_chunk(tree):
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    raise NotImplementedError
+
+    return []
 
 
 if __name__ == "__main__":
