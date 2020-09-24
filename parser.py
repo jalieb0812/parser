@@ -17,25 +17,19 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> NP VP | VP NP| NP VP Conj VP NP | NP VP NP| NP VP VP | NP VP NP NP | \
-NP VP NP VP | NP VP NP NP
+S -> NP VP | VP NP| S Conj S | S NP| S VP | S NP NP | S NP NP
 
-NP -> N | DET | DET VP | Conj N | Det AD N | PP N | PP N | \
-Det Adj N | Det Adj Adj N | Det N PP | N VP | Conj N VP \
-| ADV VP DET | N Adv VP | Conj N VP PP | N Adv | Det N Adv | N VP
+NP -> N | Det N | Det AD N | PP N | AD N | Det N PP | N VP | COJ N | N Adv | N VP
 
-VP -> V | V  NP | V Adv | V AD | V Adv NP | V NP PP | V P | P V | V NP NP | Conj V N | \
-Conj V | NP V | V Det NP
+VP -> V | V  NP | V ADV | V AD | V NP PP | V PP | P V | V NP NP | Conj V
 
-PP -> P | P NP | P Det
+PP -> P | P NP | NP P |P Det | PP
 
-AD -> Adj | Det Adj Adj | Det Adj Adj Adj | Adj Conj Adj
+AD -> Adj | Det Adj | Det Adj Adj | Det Adj Adj Adj | Adj Conj Adj
 
-ADV -> Adv | NP Adv
+ADV -> Adv | NP Adv | adv NP
 
-DET -> Det | Det N
-
-CONJ -> Conj | Conj Det | Conj P | Conj Adv
+CONJ -> Conj | Conj Det | Conj P | Conj Adv | Conj S
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -112,8 +106,30 @@ def np_chunk(tree):
     noun phrases as subtrees.
     """
 
-    return []
 
+
+    #print(tree.label())
+    print()
+    #subtrees = tree.subtrees(lambda t)
+    np_chunks = []
+
+    #filter subtrees for lables with NP
+    for subtree in tree.subtrees(lambda subtree: subtree.label() == "NP"):
+
+        # if no subtrees that also have label NP then append
+        if not has_np(subtree):
+            np_chunks.append(subtree)
+
+    return np_chunks
+
+def has_np(subtree):
+    for subsubtree in subtree.subtrees():
+        if subsubtree == subtree:
+            continue
+        elif subsubtree.label() == "NP":
+            return True
+
+    return False
 
 if __name__ == "__main__":
     main()
